@@ -1,0 +1,37 @@
+<!-- BioMed AI Watch subscribe form. Drop into any page of dkundnani.bio.
+     Replace WEB_APP_URL with your Apps Script /exec URL. -->
+<section class="bmaw-subscribe" style="max-width:560px;margin:32px auto;padding:24px;border:1px solid #e3e3e3;border-radius:12px">
+  <h3 style="margin:0 0 6px">BioMed AI Watch</h3>
+  <p style="margin:0 0 14px;color:#555">A weekly briefing on AI in medicine: new research, awarded grants,
+    pharma &amp; device updates, and open research gaps. Free, one email a week.</p>
+  <form id="bmaw-form" style="display:flex;gap:8px;flex-wrap:wrap">
+    <input type="email" name="email" required placeholder="you@institution.edu" aria-label="Email address"
+           style="flex:1 1 220px;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font:inherit">
+    <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+    <button type="submit" style="padding:10px 18px;border:0;border-radius:8px;background:#cf4310;color:#fff;font:inherit;font-weight:600;cursor:pointer">Subscribe</button>
+  </form>
+  <p id="bmaw-msg" role="status" style="margin:10px 0 0;font-size:14px"></p>
+</section>
+<script>
+(() => {
+  const WEB_APP_URL = 'PASTE_YOUR_WEB_APP_EXEC_URL_HERE';
+  const form = document.getElementById('bmaw-form'), msg = document.getElementById('bmaw-msg');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button');
+    btn.disabled = true; msg.textContent = 'Subscribing…';
+    try {
+      const body = new URLSearchParams(new FormData(form));
+      body.set('source', location.pathname);
+      const res = await fetch(WEB_APP_URL, { method: 'POST', body });
+      const data = await res.json();
+      msg.textContent = data.ok ? data.message : data.error;
+      if (data.ok) form.reset();
+    } catch (err) {
+      msg.textContent = 'Something went wrong. Please try again.';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>

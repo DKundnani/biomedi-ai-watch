@@ -1,0 +1,62 @@
+# BioMed AI Watch configuration. All sources are free, public APIs.
+lookback_days: 7
+
+papers:
+  max_per_source: 40
+  pubmed_query: >-
+    ("artificial intelligence"[tiab] OR "machine learning"[tiab] OR "deep learning"[tiab]
+    OR "large language model"[tiab] OR "foundation model"[tiab])
+    AND (clinical[tiab] OR medicine[tiab] OR patient*[tiab] OR diagnos*[tiab] OR drug[tiab])
+  arxiv_query: >-
+    (cat:cs.LG OR cat:cs.CL OR cat:cs.CV OR cat:eess.IV OR cat:q-bio.QM)
+    AND (abs:clinical OR abs:medical OR abs:patient OR abs:radiology OR abs:"drug discovery")
+  medrxiv_keywords: ["machine learning", "deep learning", "artificial intelligence", "large language model", "neural network"]
+
+grants:
+  # Awards appear in NIH RePORTER / NSF with a lag, so look back further and skip ones already reported.
+  lookback_days: 30
+  max_per_source: 40
+  keywords: ["artificial intelligence", "machine learning", "deep learning", "large language model"]
+
+products:
+  lookback_days: 30   # openFDA 510(k) data is published with a lag
+  max_per_source: 30
+  device_keywords: ["artificial intelligence", "machine learning", "deep learning", "algorithm", "ai-", "software"]
+  rss_feeds:
+    - name: FDA Press Releases
+      url: https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/press-releases/rss.xml
+    - name: Fierce Biotech
+      url: https://www.fiercebiotech.com/rss/xml
+    - name: STAT News
+      url: https://www.statnews.com/feed/
+  rss_keywords: ["AI", "artificial intelligence", "machine learning", "algorithm", "digital health", "FDA clears", "approval"]
+
+spotlight:
+  # One topic per week, rotating by ISO week number. Override any run with --topic "...".
+  topics:
+    - Electronic health records
+    - Medical imaging and radiology
+    - Digital pathology
+    - Drug discovery and development
+    - Clinical decision support
+    - Genomics and precision medicine
+    - Mental health and psychiatry
+    - Clinical trials design and recruitment
+    - Ambient clinical documentation
+    - Wearables and remote patient monitoring
+    - Oncology
+    - Cardiology
+    - Health equity and algorithmic bias
+    - Medical large language models and agents
+    - Sepsis and critical care
+    - Ophthalmology
+
+llm:
+  model: claude-opus-5-5
+  effort: high
+  max_tokens: 64000
+
+newsletter:
+  title: BioMed AI Watch
+  site_url: https://dkundnani.bio/biomed-ai-watch   # GitHub Pages for this repo (docs/)
+  asset_base_url: https://raw.githubusercontent.com/DKundnani/biomed-ai-watch/main/docs   # chart images in emails

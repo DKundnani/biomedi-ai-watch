@@ -1,0 +1,27 @@
+[project]
+name = "biomed-ai-watch"
+version = "0.1.0"
+description = "Weekly AI-in-medicine intelligence: papers, grants, pharma/device updates, research gaps, and a newsletter."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "anthropic>=1.0",
+  "requests>=2.31",
+  "feedparser>=6.0",
+  "pyyaml>=6.0",
+  "markdown>=3.5",
+  "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+biomed-ai-watch = "biomed_ai_watch.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
