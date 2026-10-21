@@ -57,7 +57,7 @@ jobs:
         run: |
           git config --global user.name "biomed-ai-watch[bot]"
           git config --global user.email "biomed-ai-watch@users.noreply.github.com"
-          git add data issues social charts
+          git add data issues social
           git diff --cached --quiet || git commit -m "Issue $(date -u +%F)"
           git push
 

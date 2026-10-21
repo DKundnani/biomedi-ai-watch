@@ -15,19 +15,26 @@ It's written by Claude from public data and emailed to subscribers from your own
 | Research gaps | all of the above + previous issues | novel gaps, marked when recurring |
 | Social drafts | — | LinkedIn post, X thread, Bluesky post for review |
 
+## What lives where
+
+| Repo | Holds |
+|---|---|
+| **biomedi-ai-watch** (this one) | All newsletter logic: collectors, Claude analysis, spotlight and charts, rendering, the weekly Action, the Apps Script subscription and sending code (`apps_script/`), and pipeline state (`data/`, `issues/`, `social/`) |
+| **dkundnani.github.io** | Website content only: `newsletter.html`, the issue page template, and the published issues, charts and email files under `newsletter/`. The Action writes these, and the website never runs newsletter code |
+
 ## How it fits together
 
 ```
  this repo: GitHub Action (Sun 14:00 UTC)           dkundnani.bio (DKundnani/dkundnani.github.io)
  ┌────────────────────────────────────┐             ┌────────────────────────────────────────────┐
  │ collect → spotlight → analyse      │   commits   │ newsletter.html       subscribe + archive   │
- │ archives issues/, social/, data/   │ ──────────► │ newsletter/<date>.html issue page          │
+ │ keeps data/, issues/, social/      │ ──────────► │ newsletter/<date>.html + assets/ (charts)  │
  └────────────────────────────────────┘             │ newsletter/latest.html / latest.json       │
                                                     └──────────────────┬─────────────────────────┘
                                                                        │ read Monday 08:00
                                     ┌──────────────────────────────────▼─────────────────────────┐
                                     │ the site's existing Apps Script mail relay                 │
-                                    │  scripts/mail-relay.gs + scripts/newsletter.gs             │
+                                    │  site's scripts/mail-relay.gs + this repo's newsletter.gs  │
                                     │  sign-ups pass the relay's spam gate, then double opt-in   │
                                     │  subscribers in a Google Sheet in Drive; sends via Gmail   │
                                     │  confirm / unsubscribe links; Drive archive of each issue  │
@@ -61,8 +68,8 @@ pytest
 
 ### 2. Subscriptions (in the website's Apps Script project)
 1. Open the existing mail-relay project at <https://script.google.com>. Add a file `newsletter.gs` with the
-   contents of `scripts/newsletter.gs` from the website repo, and replace `Code.gs` with the updated
-   `scripts/mail-relay.gs`.
+   contents of `apps_script/newsletter.gs` from this repo, and replace the relay file with the updated
+   `scripts/mail-relay.gs` from the website repo. That file only gained the two-line hand-off to `newsletter.gs`.
 2. Run **`newsletterSetup`** once and approve the new Drive and Sheets permissions. It creates a
    `BioMed AI Watch` folder with the subscriber Sheet and an `Archive` folder, and installs the Monday 08:00 trigger.
 3. **Deploy → Manage deployments → edit the existing deployment → Version: New version**. The URL stays
