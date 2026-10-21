@@ -58,5 +58,6 @@ llm:
 
 newsletter:
   title: BioMed AI Watch
-  site_url: https://dkundnani.bio/biomed-ai-watch   # GitHub Pages for this repo (docs/)
-  asset_base_url: https://raw.githubusercontent.com/DKundnani/biomed-ai-watch/main/docs   # chart images in emails
+  site_dir: ../dkundnani.github.io           # local checkout of the website repo
+  site_url: https://dkundnani.bio/newsletter
+  asset_base_url: https://dkundnani.bio/newsletter/assets   # chart images in emails

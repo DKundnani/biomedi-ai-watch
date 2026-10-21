@@ -7,13 +7,13 @@ import logging
 from datetime import date, timedelta
 from pathlib import Path
 
-from . import analysis, newsletter, spotlight
+from . import analysis, newsletter, site, spotlight
 from .config import ROOT, load_config, week_window
 from .models import Item
 from .sources import grants, papers, products
 
 log = logging.getLogger("biomed_ai_watch")
-DATA, DOCS = ROOT / "data", ROOT / "docs"
+DATA, ISSUES, SOCIAL, CHARTS = ROOT / "data", ROOT / "issues", ROOT / "social", ROOT / "charts"
 
 
 def already_reported(current: str) -> set[str]:
@@ -46,30 +46,31 @@ def past_gaps(limit_issues: int = 4) -> list[str]:
     return gaps
 
 
-def publish(cfg: dict, end: date, items: list[Item], a: dict, sp: dict | None) -> Path:
-    title, site = cfg["newsletter"]["title"], cfg["newsletter"]["site_url"].rstrip("/")
-    d = end.isoformat()
+def publish(cfg: dict, end: date, items: list[Item], a: dict, sp: dict | None, site_dir: Path) -> Path:
+    nl = cfg["newsletter"]
+    title, d = nl["title"], end.isoformat()
     week_label = f"week ending {end:%B %-d, %Y}"
-    issue_url = f"{site}/issues/{d}" if site else ""
+    issue_url = f"{nl['site_url'].rstrip('/')}/{d}.html"
 
+    # Archive copies in this repo.
     issue_md = newsletter.render_issue(a, items, title, week_label, d, sp)
-    (DOCS / "issues").mkdir(parents=True, exist_ok=True)
-    (DOCS / "issues" / f"{d}.md").write_text(issue_md)
-    (DOCS / "social").mkdir(exist_ok=True)
-    (DOCS / "social" / f"{d}.md").write_text(newsletter.render_social(a, issue_url))
+    ISSUES.mkdir(exist_ok=True)
+    SOCIAL.mkdir(exist_ok=True)
+    (ISSUES / f"{d}.md").write_text(issue_md)
+    (SOCIAL / f"{d}.md").write_text(newsletter.render_social(a, issue_url))
 
-    # The Apps Script sender reads these two files every week.
-    html = newsletter.render_email_html(issue_md, title, issue_url, cfg["newsletter"].get("asset_base_url", ""))
-    (DOCS / "latest.html").write_text(html)
-    (DOCS / "latest.json").write_text(json.dumps(
-        {"date": d, "subject": f"{title}: {a['headline']}", "url": issue_url}, indent=2))
+    # The website: issue page, chart images, archive list, and the files the Monday sender reads.
+    charts = [CHARTS / name for name in (sp["charts"] if sp else [])]
+    page = site.write_issue_page(site_dir, d, a["headline"], week_label, issue_md, " ".join(a["tldr"])[:300], charts)
+    email = newsletter.render_email_html(issue_md, title, issue_url, nl["asset_base_url"])
+    site.write_latest(site_dir, d, f"{title}: {a['headline']}", issue_url, email)
 
     issues = []
-    for f in sorted((DOCS / "issues").glob("*.md"), reverse=True):
+    for f in sorted(ISSUES.glob("*.md"), reverse=True):
         head = f.read_text().split("\n", 3)[1]
         issues.append((f.stem, head.removeprefix("title: ").strip('"')))
-    (DOCS / "index.md").write_text(newsletter.render_index(title, issues))
-    return DOCS / "issues" / f"{d}.md"
+    site.update_archive(site_dir, issues)
+    return page
 
 
 def main() -> None:
@@ -79,6 +80,7 @@ def main() -> None:
     p.add_argument("--config", type=Path)
     p.add_argument("--topic", help="spotlight topic for this issue (default: next in config rotation)")
     p.add_argument("--no-spotlight", action="store_true")
+    p.add_argument("--site-dir", type=Path, help="checkout of the website repo (default: newsletter.site_dir in config)")
     args = p.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
@@ -96,7 +98,7 @@ def main() -> None:
     sp = None
     if not args.no_spotlight:
         try:
-            sp = spotlight.build(cfg, end, DOCS / "issues" / "assets", args.topic)
+            sp = spotlight.build(cfg, end, CHARTS, args.topic)
             (out / "spotlight.json").write_text(json.dumps(sp, indent=1))
         except Exception:  # the issue still goes out without a spotlight
             log.exception("spotlight failed")
@@ -104,7 +106,8 @@ def main() -> None:
     a = analysis.analyze(items, past_gaps(), f"{start} to {end}", cfg["llm"],
                          spotlight_md=sp["markdown"] if sp else "")
     (out / "analysis.json").write_text(json.dumps(a, indent=1))
-    log.info("published %s", publish(cfg, end, items, a, sp))
+    site_dir = (args.site_dir or ROOT / cfg["newsletter"]["site_dir"]).resolve()
+    log.info("published %s", publish(cfg, end, items, a, sp, site_dir))
 
 
 if __name__ == "__main__":

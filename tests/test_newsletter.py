@@ -39,3 +39,18 @@ def test_render_issue_and_email():
     html = render_email_html(md, "BioMed AI Watch", "https://example.org/issues/2026-10-21")
     assert "{{UNSUBSCRIBE_URL}}" in html and "<h2" in html and "title:" not in html
     assert "2/2 b" in render_social(a, "")
+
+
+def test_site_publish(tmp_path):
+    from biomed_ai_watch import site
+    (tmp_path / "newsletter").mkdir()
+    (tmp_path / "newsletter" / "_template.html").write_text("<h1>{{TITLE}}</h1><p>{{WEEK}}</p>{{CONTENT}}<a href='{{URL}}'>")
+    (tmp_path / "newsletter.html").write_text("a<!-- issues:start -->old<!-- issues:end -->b")
+    a = _drop_unknown_ids({**ANALYSIS}, {i.id for i in ITEMS})
+    md = render_issue(a, ITEMS, "BioMed AI Watch", "week ending October 21, 2026", "2026-10-21")
+    page = site.write_issue_page(tmp_path, "2026-10-21", a["headline"], "wk", md, "d", [])
+    out = page.read_text()
+    assert "<h1>LLMs reach the emergency department</h1>" in out and "TL;DR" in out and "# BioMed" not in out
+    site.update_archive(tmp_path, [("2026-10-21", "LLMs & EDs")])
+    arch = (tmp_path / "newsletter.html").read_text()
+    assert "old" not in arch and 'href="newsletter/2026-10-21.html"' in arch and "LLMs &amp; EDs" in arch

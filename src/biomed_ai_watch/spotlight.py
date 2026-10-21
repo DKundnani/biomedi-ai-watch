@@ -110,12 +110,12 @@ def plot_trend(topic: str, trend: dict, path: Path) -> None:
     rows = trend["rows"]
     years = [str(r["year"]) + (" (YTD)" if r["year"] == trend["partial_year"] else "") for r in rows]
     fig, ax = plt.subplots(figsize=(8, 4.2), dpi=150)
-    ax.bar(years, [r["topic_ai"] for r in rows], color="#0b5c6b")
+    ax.bar(years, [r["topic_ai"] for r in rows], color="#fb923c")
     ax.set_ylabel("AI papers on PubMed")
     ax.tick_params(axis="x", rotation=45)
     ax2 = ax.twinx()
-    ax2.plot(years, [r["ai_share_pct"] for r in rows], color="#cf4310", marker="o", linewidth=2)
-    ax2.set_ylabel("% of all papers on the topic", color="#cf4310")
+    ax2.plot(years, [r["ai_share_pct"] for r in rows], color="#9a3412", marker="o", linewidth=2)
+    ax2.set_ylabel("% of all papers on the topic", color="#9a3412")
     ax2.set_ylim(bottom=0)
     for a in (ax, ax2):
         a.spines["top"].set_visible(False)
@@ -192,7 +192,7 @@ def plot_gap_map(topic: str, gm: dict, path: Path) -> None:
     rows, facets = gm["rows"], gm["facets"]
     data = [[r["pct"][f] for f in facets] for r in rows]
     fig, ax = plt.subplots(figsize=(9, 0.55 * len(rows) + 2.2), dpi=150)
-    im = ax.imshow(data, cmap="YlGnBu", aspect="auto", vmin=0)
+    im = ax.imshow(data, cmap="Oranges", aspect="auto", vmin=0)
     ax.set_xticks(range(len(facets)), facets, rotation=30, ha="right", fontsize=8)
     ax.set_yticks(range(len(rows)), [f"{r['subtopic']} (n={r['ai_papers']:,})" for r in rows], fontsize=8)
     vmax = max((v for row in data for v in row), default=1) or 1

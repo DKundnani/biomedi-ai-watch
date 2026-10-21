@@ -82,13 +82,6 @@ def render_social(a: dict, issue_url: str) -> str:
             f"## Bluesky\n\n{s['bluesky_post']}{link}\n")
 
 
-def render_index(title: str, issues: list[tuple[str, str]]) -> str:
-    """issues: [(date, headline)] newest first."""
-    rows = "\n".join(f"- **{d}** — [{h}](issues/{d}.md)" for d, h in issues)
-    return (f"# {title}\n\nWeekly intelligence on AI in medicine: new research, awarded grants, "
-            f"pharma & device updates, and the research gaps they reveal.\n\n## Issues\n\n{rows}\n")
-
-
 def render_email_html(issue_md: str, title: str, issue_url: str, asset_base: str = "") -> str:
     """Self-contained, inline-styled HTML for email clients. {{UNSUBSCRIBE_URL}} is filled per subscriber."""
     import markdown
@@ -96,18 +89,19 @@ def render_email_html(issue_md: str, title: str, issue_url: str, asset_base: str
     body_md = issue_md.split("---", 2)[2] if issue_md.startswith("---") else issue_md
     body = markdown.markdown(body_md, extensions=["sane_lists"])
     if asset_base:  # email clients need absolute image URLs
-        body = body.replace('src="assets/', f'src="{asset_base.rstrip("/")}/issues/assets/')
+        body = body.replace('src="assets/', f'src="{asset_base.rstrip("/")}/')
     body = body.replace("<img ", '<img style="max-width:100%;height:auto" ')
     body = (body.replace("<h1>", '<h1 style="font-size:22px;margin:0 0 8px">')
-                .replace("<h2>", '<h2 style="font-size:18px;margin:28px 0 8px;color:#0b5c6b">')
+                .replace("<h2>", '<h2 style="font-size:18px;margin:28px 0 8px;color:#cf4310">')
                 .replace("<h3>", '<h3 style="font-size:15px;margin:20px 0 6px">')
-                .replace("<a ", '<a style="color:#0b5c6b" '))
+                .replace("<a ", '<a style="color:#cf4310" '))
     web = f'<p style="font-size:12px;color:#666"><a href="{issue_url}">Read on the web</a></p>' if issue_url else ""
     return f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title></head>
 <body style="margin:0;background:#f4f6f7">
-<div style="max-width:640px;margin:0 auto;padding:24px;background:#fff;font-family:Georgia,serif;font-size:15px;line-height:1.55;color:#1d2327">
+<div style="max-width:640px;margin:0 auto;padding:24px;background:#fff;font-family:Inter,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1d2327">
 {web}{body}
 <hr style="border:none;border-top:1px solid #ddd;margin:28px 0">
 <p style="font-size:12px;color:#666">You're receiving this because you subscribed to {title}.
-<a href="{{{{UNSUBSCRIBE_URL}}}}">Unsubscribe</a>.</p>
+<a href="{{{{UNSUBSCRIBE_URL}}}}">Unsubscribe</a> ·
+<a href="https://dkundnani.bio/newsletter.html">Past issues</a> · Deepali Kundnani, dkundnani.bio</p>
 </div></body></html>"""
