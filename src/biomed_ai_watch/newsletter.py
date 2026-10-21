@@ -15,7 +15,9 @@ def _refs(ids: list[str], index: dict[str, Item]) -> str:
 def _highlights(rows: list[dict], index: dict[str, Item], show_amount: bool = False) -> list[str]:
     out = []
     for h in rows:
-        it = index[h["id"]]
+        it = index.get(h["id"])
+        if it is None:
+            continue
         meta = [it.source, it.extra.get("journal") or it.extra.get("institution") or ""]
         if show_amount and it.extra.get("amount_usd"):
             meta.append(f"${int(it.extra['amount_usd']):,}")
