@@ -35,9 +35,9 @@ It's written by Claude from public data and emailed to subscribers from your own
                                     ┌──────────────────────────────────▼─────────────────────────┐
                                     │ the site's existing Apps Script mail relay                 │
                                     │  site's scripts/mail-relay.gs + this repo's newsletter.gs  │
-                                    │  sign-ups pass the relay's spam gate, then double opt-in   │
+                                    │  sign-ups pass the relay's spam gate, active at once       │
                                     │  subscribers in a Google Sheet in Drive; sends via Gmail   │
-                                    │  confirm / unsubscribe links; Drive archive of each issue  │
+                                    │  unsubscribe links; Drive archive of each issue            │
                                     └────────────────────────────────────────────────────────────┘
 ```
 
@@ -76,8 +76,8 @@ pytest
    the same, so the forms on the site keep working.
 
 ### 3. Test with your Gmail
-1. On dkundnani.bio/newsletter.html, subscribe your Gmail. A confirmation email should arrive, and the
-   Sheet row should go from `pending` to `active` when you click its link.
+1. On dkundnani.bio/newsletter.html, subscribe your Gmail. A row with status `active` should appear in
+   the Sheet straight away. No confirmation email is sent.
 2. After the first issue is published, run **`sendTestToMe`** for a `[TEST]` copy, then **`sendWeekly`** to send it for real.
 3. Click **Unsubscribe** in the issue. The row should change to `unsubscribed`.
 

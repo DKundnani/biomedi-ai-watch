@@ -7,7 +7,9 @@
  * spam gate (honeypot, page stamp, captcha, hourly cap) before reaching
  * subscribe(). The relay calls two functions defined here:
  *   subscribe(data)        from doPost when data._action === "subscribe"
- *   newsletterLink(params) from doGet when ?action=confirm|unsubscribe
+ *   newsletterLink(params) from doGet when ?action=unsubscribe
+ * Sign-ups are active at once, with no confirmation email. confirm links
+ * sent before that change still work.
  * Subscribers are kept in a Google Sheet in Drive; sendWeekly() reads the
  * issue this repo's pipeline publishes to dkundnani.bio/newsletter/.
  *
@@ -69,8 +71,8 @@ function nlSet(row, field, value) {
 
 /* --------------------------------------------------------- subscriptions */
 
-/* Called by doPost once the spam gate has passed. Double opt-in: nobody is
-   mailed an issue until they click the link sent to their own inbox. */
+/* Called by doPost once the spam gate has passed. The address is active at
+   once; no confirmation email is sent. */
 function subscribe(data) {
   var email = String(data.email || "").trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 254) {
@@ -81,22 +83,13 @@ function subscribe(data) {
   try {
     var existing = nlRows().filter(function (r) { return r.email === email; })[0];
     if (existing && existing.status === "active") return { ok: true };   // say nothing new
-    var token = existing ? existing.token : Utilities.getUuid();
     if (existing) {
-      nlSet(existing.row, "status", "pending");
+      nlSet(existing.row, "status", "active");
       nlSet(existing.row, "subscribed_at", new Date());
+      nlSet(existing.row, "unsubscribed_at", "");
     } else {
-      nlSheet().appendRow([email, "pending", token, new Date(), "", "", String(data._page || "").substring(0, 200), ""]);
+      nlSheet().appendRow([email, "active", Utilities.getUuid(), new Date(), "", "", String(data._page || "").substring(0, 200), ""]);
     }
-    var url = nlLink("confirm", token);
-    MailApp.sendEmail(email, "Confirm your subscription to " + NL_NAME,
-      "Confirm your subscription: " + url + "\n\nIf you did not ask for this, ignore this email.", {
-        name: NL_NAME,
-        htmlBody:
-          '<p>Please confirm your subscription to <b>' + NL_NAME + '</b>, a weekly briefing on AI in medicine from Deepali Kundnani.</p>' +
-          '<p><a href="' + url + '" style="background:#cf4310;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirm subscription</a></p>' +
-          '<p style="color:#666;font-size:12px">If you did not ask for this, ignore this email and you will not be subscribed.</p>'
-      });
   } finally {
     lock.releaseLock();
   }
