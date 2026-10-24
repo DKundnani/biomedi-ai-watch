@@ -8,7 +8,7 @@ import tempfile
 from datetime import date, timedelta
 from pathlib import Path
 
-from . import analysis, newsletter, site, spotlight
+from . import analysis, charts, newsletter, site, spotlight
 from .config import ROOT, load_config, week_window
 from .models import Item
 from .sources import grants, papers, products
@@ -54,24 +54,27 @@ def publish(cfg: dict, end: date, items: list[Item], a: dict, sp: dict | None, s
     week_label = f"week ending {end:%B %-d, %Y}"
     issue_url = f"{nl['site_url'].rstrip('/')}/{d}.html"
 
+    # The chart picker chooses this week's graphs from the data and draws them as slides.
+    slides = charts.build(items, a, sp, cfg["llm"], chart_dir, d)
+
     # Archive copies in this repo.
-    issue_md = newsletter.render_issue(a, items, title, week_label, d, sp)
+    issue_md = newsletter.render_issue(a, items, title, week_label, d, sp, slides)
     ISSUES.mkdir(exist_ok=True)
     SOCIAL.mkdir(exist_ok=True)
     (ISSUES / f"{d}.md").write_text(issue_md)
     (SOCIAL / f"{d}.md").write_text(newsletter.render_social(a, issue_url))
 
-    # The website: issue page, chart images, archive list, and the files the Monday sender reads.
-    charts = [chart_dir / name for name in (sp["charts"] if sp else [])]  # copied into the site
-    page = site.write_issue_page(site_dir, d, a["headline"], week_label, issue_md, " ".join(a["tldr"])[:300], charts)
+    # The website: issue page, slide images, the newsletter home, and the files the Monday sender reads.
+    cover = next((s["file"] for s in slides if s["section"] == "spotlight"), slides[0]["file"] if slides else None)
+    entry = {"date": d, "title": a["headline"], "subtitle": a.get("subtitle", ""),
+             "topic": sp["topic"] if sp else "", "cover": cover,
+             "read_min": max(1, round(len(issue_md.split()) / 230)), "description": " ".join(a["tldr"])[:300]}
+    issues = site.save_index(site_dir, entry)
+    page = site.write_issue_page(site_dir, entry, issue_md, [chart_dir / s["file"] for s in slides], issues)
+    site.refresh_neighbours(site_dir, issues)
+    site.update_index_page(site_dir, issues)
     email = newsletter.render_email_html(issue_md, title, issue_url, nl["asset_base_url"])
     site.write_latest(site_dir, d, f"{title}: {a['headline']}", issue_url, email)
-
-    issues = []
-    for f in sorted(ISSUES.glob("*.md"), reverse=True):
-        head = f.read_text().split("\n", 3)[1]
-        issues.append((f.stem, head.removeprefix("title: ").strip('"')))
-    site.update_archive(site_dir, issues)
     return page
 
 
@@ -85,6 +88,7 @@ def main() -> None:
     p.add_argument("--site-dir", type=Path, help="checkout of the website repo (default: newsletter.site_dir in config)")
     args = p.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
     cfg = load_config(args.config)
     start, end = week_window(cfg, args.end)
@@ -101,7 +105,7 @@ def main() -> None:
     sp = None
     if not args.no_spotlight:
         try:
-            sp = spotlight.build(cfg, end, chart_dir, args.topic)
+            sp = spotlight.build(cfg, end, args.topic)
             (out / "spotlight.json").write_text(json.dumps(sp, indent=1))
         except Exception:  # the issue still goes out without a spotlight
             log.exception("spotlight failed")

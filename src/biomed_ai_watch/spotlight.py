@@ -88,58 +88,6 @@ def pubmed_trend(topic_query: str, end: date, years: int = 10) -> dict:
     return {"query": topic_query, "ai_clause": AI_CLAUSE, "rows": rows, "partial_year": end.year}
 
 
-def plot_trend(topic: str, trend: dict, path: Path) -> None:
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    rows = trend["rows"]
-    years = [str(r["year"]) + (" (YTD)" if r["year"] == trend["partial_year"] else "") for r in rows]
-    fig, ax = plt.subplots(figsize=(8, 4.2), dpi=150)
-    ax.bar(years, [r["topic_ai"] for r in rows], color="#fb923c")
-    ax.set_ylabel("AI papers on PubMed")
-    ax.tick_params(axis="x", rotation=45)
-    ax2 = ax.twinx()
-    ax2.plot(years, [r["ai_share_pct"] for r in rows], color="#9a3412", marker="o", linewidth=2)
-    ax2.set_ylabel("% of all papers on the topic", color="#9a3412")
-    ax2.set_ylim(bottom=0)
-    for a in (ax, ax2):
-        a.spines["top"].set_visible(False)
-    ax.set_title(f"AI research on {topic}: publications per year and share of the field", fontsize=11)
-    fig.text(0.01, 0.01, "Source: PubMed E-utilities counts", fontsize=7, color="#666")
-    fig.tight_layout()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path)
-    plt.close(fig)
-
-
-def plot_spec(spec: dict, path: Path) -> None:
-    """Render a chart the model proposed from figures it found in its sources."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(figsize=(8, 4.2), dpi=150)
-    n = len(spec["series"])
-    for k, s in enumerate(spec["series"]):
-        if spec.get("type") == "bar":
-            w = 0.8 / n
-            ax.bar([i + k * w for i in range(len(spec["x"]))], s["values"], width=w, label=s["name"])
-            ax.set_xticks([i + 0.4 - w / 2 for i in range(len(spec["x"]))], spec["x"])
-        else:
-            ax.plot(spec["x"], s["values"], marker="o", linewidth=2, label=s["name"])
-    ax.set_title(spec["title"], fontsize=11)
-    ax.set_xlabel(spec.get("x_label", ""))
-    ax.set_ylabel(spec.get("y_label", ""))
-    ax.spines[["top", "right"]].set_visible(False)
-    if n > 1:
-        ax.legend(frameon=False)
-    fig.text(0.01, 0.01, f"Source: {spec.get('source', '')}"[:160], fontsize=7, color="#666")
-    fig.tight_layout()
-    fig.savefig(path)
-    plt.close(fig)
-
-
 # ---------- 3. gap map: where AI work is thin ----------
 
 # Columns of the gap map. Each restricts AI + subtopic papers to an evidence stage or population.
@@ -167,33 +115,14 @@ def gap_map(topic_query: str, subtopics: list[dict], end: date, years: int = 5) 
             continue
         rows.append({"subtopic": st["name"], "ai_papers": total, "counts": cells,
                      "pct": {k: round(100 * v / total, 1) if total else 0.0 for k, v in cells.items()}})
-    return {"years": f"{end.year - years + 1}-{end.year}", "facets": list(FACETS), "rows": rows}
-
-
-def plot_gap_map(topic: str, gm: dict, path: Path) -> None:
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    rows, facets = gm["rows"], gm["facets"]
-    data = [[r["pct"][f] for f in facets] for r in rows]
-    fig, ax = plt.subplots(figsize=(9, 0.55 * len(rows) + 2.2), dpi=150)
-    im = ax.imshow(data, cmap="Oranges", aspect="auto", vmin=0)
-    ax.set_xticks(range(len(facets)), facets, rotation=30, ha="right", fontsize=8)
-    ax.set_yticks(range(len(rows)), [f"{r['subtopic']} (n={r['ai_papers']:,})" for r in rows], fontsize=8)
-    vmax = max((v for row in data for v in row), default=1) or 1
-    for i, r in enumerate(rows):
-        for j, f in enumerate(facets):
-            ax.text(j, i, f"{r['counts'][f]:,}\n{r['pct'][f]:.0f}%", ha="center", va="center", fontsize=6.5,
-                    color="white" if r["pct"][f] > vmax * 0.6 else "#1d2327")
-    fig.colorbar(im, ax=ax, label="% of the subarea's AI papers", shrink=0.8)
-    ax.set_title(f"Gap map: AI research on {topic}, {gm['years']}\n"
-                 "Pale cells = little evidence at that stage or for that population", fontsize=10)
-    fig.text(0.01, 0.01, "Source: PubMed E-utilities counts; facet matching is keyword-based and approximate",
-             fontsize=6.5, color="#666")
-    fig.tight_layout()
-    fig.savefig(path)
-    plt.close(fig)
+    overall = None
+    try:
+        base = f"({topic_query}) AND {AI_CLAUSE} AND {window}"
+        overall = {"years": f"{end.year - years + 1}-{end.year}", "total": _count(base),
+                   "counts": {name: _count(f"{base} AND {clause}") for name, clause in FACETS.items()}}
+    except Exception as e:
+        log.warning("topic-wide facet counts failed: %s", e)
+    return {"years": f"{end.year - years + 1}-{end.year}", "facets": list(FACETS), "rows": rows, "overall": overall}
 
 
 def gap_map_text(gm: dict) -> str:
@@ -221,6 +150,9 @@ Gap map: AI papers per subarea over the last five years, and how many reach each
 population (count, % of that subarea). Low percentages are candidate gaps. Readers see this as a heatmap:
 {gap_map}
 
+Evidence funnel, all AI papers on the topic in the last five years and how many reach each stage:
+{funnel}
+
 The purpose of the spotlight is to discover NOVEL, specific research gaps in medical AI for this topic:
 questions that are important, under-studied, and answerable now. Use the gap map as quantitative
 evidence, then use the web to check each candidate: is someone already closing it (recent trials,
@@ -232,34 +164,42 @@ new studies and preprints, deployments at health systems, product launches and r
 funding and partnerships, policy and standards, and expert critiques. Open the most important sources to
 confirm details. Prefer primary sources (journals, FDA, NIH, company and health-system announcements).
 
-Then write the spotlight in Markdown (about 900-1300 words), starting at heading level 3:
-### Why it matters now
-### Recent developments   (dated bullets, each with an inline [source](url) link)
-### What the numbers show (interpret the trend and the gap map: where the field is crowded, where it is thin)
-### Novel research gaps   (3-5 gaps, ranked. For each: **the gap** in one sentence; evidence (gap-map
-                          figures and sources); why it is still open (what you checked); a concrete study
-                          that would close it (design, data source, endpoint); who could fund it)
-### Outlook
+Readers skim this between clinics, next to the charts. Be brief: at most 350 words in total, one line per
+bullet, no bullet over 30 words. Write the spotlight in Markdown, starting at heading level 3:
+### Key takeaways   (exactly 3 bullets: the most important things a reader should know)
+### What's new       (4-5 bullets, each "**Mon D** — what happened [source](url)")
+### Novel gaps       (exactly 3, ranked, as a numbered list. Each item is one line:
+                     "**The gap.** Evidence: a figure + [source](url). Study: design, data, endpoint. Funder: who.")
+### Outlook          (one sentence)
 
 Every factual claim needs an inline link to the page it came from. Don't state anything you didn't find.
+Gaps must survive your checks: drop any that recent work already covers.
 
 If your sources contain a quantitative series that exposes a gap (e.g. FDA-cleared devices vs. devices
 with prospective evidence, adoption by hospital type, funding by subarea, representation of populations in
 datasets), end with ONE fenced block tagged `chart` holding JSON:
-{{"title": str, "type": "line"|"bar", "x_label": str, "y_label": str, "x": [labels],
+{{"title": str (max 45 characters), "type": "line"|"bar", "x_label": str, "y_label": str, "x": [labels],
   "series": [{{"name": str, "values": [numbers]}}], "source": "publisher name and URL"}}
 Use only numbers taken from a source you read. Omit the block if there's nothing solid to chart."""
 
 
 def research(topic: str, terms: dict, trend: dict, gm: dict, today: date,
-             llm_cfg: dict) -> tuple[str, dict | None]:
+             llm_cfg: dict) -> tuple[str, dict | None, dict]:
     trend_txt = "\n".join(f"{r['year']}: {r['topic_ai']} AI papers ({r['ai_share_pct']}% of {r['topic']})"
                           for r in trend["rows"])
     prompt = RESEARCH_PROMPT.format(
         today=today.isoformat(), topic=topic, synonyms=", ".join(terms["synonyms"]),
         mesh=", ".join(terms["mesh_terms"]), queries="; ".join(terms["web_queries"]), trend=trend_txt,
-        gap_map=gap_map_text(gm))
+        gap_map=gap_map_text(gm), funnel=_funnel_text(gm.get("overall")))
     text = llm.web_research(prompt, llm_cfg).strip()
+    captions = {}
+    m = re.search(r"```captions\s*(\{.*?\})\s*```", text, re.S)
+    if m:
+        text = (text[: m.start()] + text[m.end():]).strip()
+        try:
+            captions = {k: str(v) for k, v in json.loads(m.group(1)).items()}
+        except ValueError as e:
+            log.warning("discarding malformed captions: %s", e)
     spec = None
     m = re.search(r"```chart\s*(\{.*?\})\s*```", text, re.S)
     if m:
@@ -270,13 +210,19 @@ def research(topic: str, terms: dict, trend: dict, gm: dict, today: date,
         except (ValueError, KeyError, AssertionError) as e:
             log.warning("discarding malformed chart spec: %s", e)
             spec = None
-    return text, spec
+    return text, spec, captions
+
+
+def _funnel_text(overall: dict | None) -> str:
+    if not overall:
+        return "(not available)"
+    return f"{overall['total']}: " + ", ".join(f"{k} {v}" for k, v in overall["counts"].items())
 
 
 # ---------- orchestration ----------
 
-def build(cfg: dict, end: date, assets_dir: Path, override: str | None = None) -> dict:
-    """Returns {"topic", "terms", "trend", "markdown", "charts": [relative paths]}."""
+def build(cfg: dict, end: date, override: str | None = None) -> dict:
+    """Returns the spotlight: topic, terms, PubMed trend and gap map, markdown, and any web-sourced series."""
     topic = pick_topic(cfg, end, override)
     log.info("spotlight topic: %s", topic)
 
@@ -290,24 +236,9 @@ def build(cfg: dict, end: date, assets_dir: Path, override: str | None = None) -
         query = " OR ".join(f'"{t}"[tiab]' for t in [topic, *terms["synonyms"]])
 
     trend = pubmed_trend(query, end)
-    charts = []
-    trend_png = assets_dir / f"{end}-spotlight-trend.png"
-    plot_trend(topic, trend, trend_png)
-    charts.append(trend_png.name)
-
     gm = gap_map(query, terms["subtopics"], end)
-    if gm["rows"]:
-        gap_png = assets_dir / f"{end}-spotlight-gapmap.png"
-        plot_gap_map(topic, gm, gap_png)
-        charts.append(gap_png.name)
+    markdown, spec, _ = research(topic, terms, trend, gm, end, cfg["llm"])
 
-    markdown, spec = research(topic, terms, trend, gm, end, cfg["llm"])
-    if spec:
-        try:
-            extra_png = assets_dir / f"{end}-spotlight-chart.png"
-            plot_spec(spec, extra_png)
-            charts.append(extra_png.name)
-        except Exception as e:
-            log.warning("could not render model chart: %s", e)
-    return {"topic": topic, "terms": terms, "trend": trend, "gap_map": gm, "markdown": markdown, "charts": charts,
+    # Charts are chosen and drawn later, from all of the issue's data (see charts.py).
+    return {"topic": topic, "terms": terms, "trend": trend, "gap_map": gm, "markdown": markdown,
             "chart_spec": spec}

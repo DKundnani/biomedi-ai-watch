@@ -84,6 +84,26 @@ pytest
 2. After the first issue is published, run **`sendTestToMe`** for a `[TEST]` copy, then **`sendWeekly`** to send it for real.
 3. Click **Unsubscribe** in the issue. The row should change to `unsubscribed`.
 
+## Editorial style (keep for every issue)
+
+Readers asked for a compact issue they can skim. Changes to prompts or rendering should keep it that way:
+- **Slides, not long text.** Charts are 16:9 slide images with two charts side by side
+  (`src/biomed_ai_watch/slides.py`), each followed by one-line takeaways that interpret the numbers.
+- **Short.** The spotlight is at most ~350 words (3 key takeaways, 4-5 dated news lines, 3 ranked gaps,
+  one-sentence outlook). The weekly analysis has 3 TL;DR bullets, 4-5 papers, 3 grants, 3 product
+  updates and 2-3 gaps, one line each. Word limits live in the schema and prompts in `analysis.py` and
+  `spotlight.py`.
+- **Charts chosen from the data.** The chart-picker skill (`skills/chart-picker/SKILL.md`, also linked into
+  `.claude/skills/`) picks chart types, pairs them into slides and writes takeaways from the week's real
+  datasets (`charts.py`). It only names datasets and columns, so every number on a slide comes from the data.
+- **Varied colours.** Slides use a multi-colour palette (`slides.PALETTE`) and a yellow-to-blue heatmap,
+  deliberately not the website's orange.
+- **Laid out like a Substack.** Modelled on Eric Topol's Ground Truths: the newsletter home has a latest-issue
+  hero, a card grid and a sidebar; each issue has a section tag, subtitle, byline, share row, contents box,
+  a mid-issue subscribe prompt and previous/next links. Page designs live in the website repo.
+- **Aimed at novel gaps.** Every chart and section should help a reader find under-studied questions in
+  medical AI; the gap map and evidence funnel come from real PubMed counts.
+
 ## Configuration
 Everything lives in `config.yaml`: search queries, lookback windows, RSS feeds, the spotlight topic rotation,
 model, and effort. The spotlight follows the topic list by ISO week number. Override it with `--topic`.

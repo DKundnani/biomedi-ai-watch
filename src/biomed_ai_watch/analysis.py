@@ -26,46 +26,51 @@ post-market surveillance), or a mismatch between where funding goes and where th
 Prefer novel gaps, ones the field has not already named repeatedly, and explain what in this week's
 records reveals them. Mark a gap as recurring when it continues one from the past issues.
 
+Be brief. The issue is read in about five minutes, next to charts that carry the numbers: every note,
+summary and bullet is one line, within the word limits given in the schema. Pick fewer, better items
+rather than listing everything.
+
 Social drafts should be accurate, non-hype, and readable by a general professional audience.
 Do not use hashtags in excess (at most three per post)."""
 
 _highlight = {
     "type": "object",
-    "properties": {"id": {"type": "string"}, "note": {"type": "string"}},
+    "properties": {"id": {"type": "string"}, "note": {"type": "string", "description": "Why it matters, at most 20 words"}},
     "required": ["id", "note"], "additionalProperties": False,
 }
 
 SCHEMA = {
     "type": "object",
     "properties": {
-        "headline": {"type": "string", "description": "One-line title for this week's issue"},
-        "tldr": {"type": "array", "items": {"type": "string"}, "description": "3-5 bullet takeaways"},
+        "headline": {"type": "string", "description": "One-line title for this week's issue, at most 12 words"},
+        "subtitle": {"type": "string", "description": "A one-line deck under the headline, at most 14 words"},
+        "tldr": {"type": "array", "items": {"type": "string"}, "description": "Exactly 3 takeaways, at most 25 words each"},
         "paper_themes": {
-            "type": "array",
+            "type": "array", "description": "2-3 themes",
             "items": {
                 "type": "object",
                 "properties": {
                     "theme": {"type": "string"},
-                    "summary": {"type": "string"},
+                    "summary": {"type": "string", "description": "At most 30 words"},
                     "ids": {"type": "array", "items": {"type": "string"}},
                 },
                 "required": ["theme", "summary", "ids"], "additionalProperties": False,
             },
         },
-        "top_papers": {"type": "array", "items": _highlight, "description": "5-8 most important papers"},
-        "grants_summary": {"type": "string"},
-        "top_grants": {"type": "array", "items": _highlight},
-        "products_summary": {"type": "string"},
-        "top_products": {"type": "array", "items": _highlight},
+        "top_papers": {"type": "array", "items": _highlight, "description": "The 4-5 most important papers"},
+        "grants_summary": {"type": "string", "description": "At most 35 words"},
+        "top_grants": {"type": "array", "items": _highlight, "description": "The 3 most notable grants"},
+        "products_summary": {"type": "string", "description": "At most 35 words"},
+        "top_products": {"type": "array", "items": _highlight, "description": "The 3 most notable updates"},
         "research_gaps": {
-            "type": "array",
+            "type": "array", "description": "2-3 gaps drawn from this week's records",
             "items": {
                 "type": "object",
                 "properties": {
-                    "gap": {"type": "string"},
-                    "evidence": {"type": "string"},
+                    "gap": {"type": "string", "description": "At most 15 words"},
+                    "evidence": {"type": "string", "description": "At most 30 words"},
                     "ids": {"type": "array", "items": {"type": "string"}},
-                    "suggested_study": {"type": "string"},
+                    "suggested_study": {"type": "string", "description": "At most 25 words"},
                     "recurring": {"type": "boolean"},
                 },
                 "required": ["gap", "evidence", "ids", "suggested_study", "recurring"],
@@ -82,7 +87,7 @@ SCHEMA = {
             "required": ["linkedin_post", "x_thread", "bluesky_post"], "additionalProperties": False,
         },
     },
-    "required": ["headline", "tldr", "paper_themes", "top_papers", "grants_summary", "top_grants",
+    "required": ["headline", "subtitle", "tldr", "paper_themes", "top_papers", "grants_summary", "top_grants",
                  "products_summary", "top_products", "research_gaps", "social"],
     "additionalProperties": False,
 }

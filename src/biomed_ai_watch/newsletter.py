@@ -18,57 +18,62 @@ def _highlights(rows: list[dict], index: dict[str, Item], show_amount: bool = Fa
         it = index.get(h["id"])
         if it is None:
             continue
-        meta = [it.source, it.extra.get("journal") or it.extra.get("institution") or ""]
+        meta = [it.extra.get("journal") or it.extra.get("institution") or it.source]
         if show_amount and it.extra.get("amount_usd"):
             meta.append(f"${int(it.extra['amount_usd']):,}")
-        out.append(f"- **{_link(it)}** — _{' · '.join(m for m in meta if m)}_  \n  {h['note']}")
+        out.append(f"- **{_link(it)}** — {h['note']} _({' · '.join(m for m in meta if m)})_")
     return out
 
 
-def render_spotlight(sp: dict) -> list[str]:
-    terms = sp["terms"]
-    L = [f"## Topic spotlight: {sp['topic']}", "",
-         f"_Also searched as: {', '.join(terms['synonyms'])}._", ""]
-    captions = {"trend": "Publication trend from PubMed", "gapmap": "Gap map: pale cells are where evidence is thin",
-                "chart": "From this week's sources"}
-    for png in sp["charts"]:
-        kind = png.rsplit("-", 1)[-1].removesuffix(".png")
-        L += [f"![{captions.get(kind, sp['topic'])}](assets/{png})", ""]
+def _slide(file: str, alt: str, captions: list[str]) -> list[str]:
+    return [f"![{alt}](assets/{file})", "", *[f"- {c}" for c in captions], ""]
+
+
+def render_spotlight(sp: dict, slides: list[dict]) -> list[str]:
+    syn = sp["terms"]["synonyms"]
+    L = [f"## Spotlight: {sp['topic']}", "",
+         f"_Also searched as {', '.join(syn[:6])}{', and more' if len(syn) > 6 else ''}._", ""]
+    for s in slides:
+        L += _slide(s["file"], s["title"], s["captions"])
     return L + [sp["markdown"], ""]
 
 
 def render_issue(a: dict, items: list[Item], title: str, week_label: str, issue_date: str,
-                 spotlight: dict | None = None) -> str:
+                 spotlight: dict | None = None, slides: list[dict] | None = None) -> str:
+    slides = slides or []
     index = {i.id: i for i in items}
     counts = {k: sum(i.kind == k for i in items) for k in ("paper", "grant", "product")}
+    dollars = sum(float(i.extra.get("amount_usd") or 0) for i in items if i.kind == "grant")
+    money = f" (${dollars / 1e6:.1f}M)" if dollars else ""
     L = [
         "---", f'title: "{a["headline"]}"', f"date: {issue_date}", "---", "",
         f"# {title} — {week_label}", "", f"## {a['headline']}", "",
-        f"_This week we scanned {counts['paper']} papers, {counts['grant']} new grants, "
-        f"and {counts['product']} pharma/device updates._", "",
-        "### TL;DR", *[f"- {t}" for t in a["tldr"]], "",
+        *([f"#### {a['subtitle']}", ""] if a.get("subtitle") else []),
+        f"_{counts['paper']} papers · {counts['grant']} new grants{money} · "
+        f"{counts['product']} pharma and device updates, scanned this week._", "",
+        "### In brief", *[f"- {t}" for t in a["tldr"]], "",
     ]
+    for s in slides:
+        if s["section"] == "week" or not spotlight:
+            L += _slide(s["file"], s["title"], s["captions"])
     if spotlight:
-        L += render_spotlight(spotlight)
-    L += ["## 1. AI medical research", ""]
+        L += render_spotlight(spotlight, [s for s in slides if s["section"] == "spotlight"])
+    L += ["## Research", ""]
     for t in a["paper_themes"]:
         refs = _refs(t["ids"], index)
         L += [f"**{t['theme']}.** {t['summary']}" + (f" ({refs})" if refs else ""), ""]
-    L += ["### Papers to read", *_highlights(a["top_papers"], index), ""]
-    L += ["## 2. Grants awarded this week", "", a["grants_summary"], "",
-          *_highlights(a["top_grants"], index, show_amount=True), ""]
-    L += ["## 3. Pharma & medical product updates", "", a["products_summary"], "",
-          *_highlights(a["top_products"], index), ""]
-    L += ["## 4. Research gaps", ""]
+    L += [*_highlights(a["top_papers"], index), ""]
+    L += ["## Grants", "", a["grants_summary"], "", *_highlights(a["top_grants"], index, show_amount=True), ""]
+    L += ["## Pharma and products", "", a["products_summary"], "", *_highlights(a["top_products"], index), ""]
+    L += ["## Gaps in this week's research", ""]
     for n, g in enumerate(a["research_gaps"], 1):
         tag = " _(recurring)_" if g["recurring"] else ""
         refs = _refs(g["ids"], index)
-        L += [f"**{n}. {g['gap']}**{tag}", "",
-              f"- Evidence: {g['evidence']}" + (f" ({refs})" if refs else ""),
-              f"- Study that would close it: {g['suggested_study']}", ""]
-    L += ["---", "_Generated automatically by BioMed AI Watch from PubMed, arXiv, medRxiv, NIH RePORTER, NSF, "
-          "openFDA and public news feeds, synthesised with Claude. Preprints are not peer reviewed. "
-          "Verify against the linked sources before acting on anything here._", ""]
+        L += [f"{n}. **{g['gap']}**{tag} {g['evidence']}" + (f" ({refs})" if refs else "")
+              + f" _Study:_ {g['suggested_study']}"]
+    L += ["", "---", "_Compiled automatically from PubMed, arXiv, medRxiv, NIH RePORTER, NSF, openFDA and public "
+          "news feeds, and synthesised with Claude. Preprints are not peer reviewed; check the linked sources "
+          "before acting on anything here._", ""]
     return "\n".join(L)
 
 
@@ -90,10 +95,11 @@ def render_email_html(issue_md: str, title: str, issue_url: str, asset_base: str
     body = markdown.markdown(body_md, extensions=["sane_lists"])
     if asset_base:  # email clients need absolute image URLs
         body = body.replace('src="assets/', f'src="{asset_base.rstrip("/")}/')
-    body = body.replace("<img ", '<img style="max-width:100%;height:auto" ')
+    body = body.replace("<img ", '<img width="592" style="width:100%;max-width:592px;height:auto;border:1px solid #e5e7eb;border-radius:8px;margin:8px 0" ')
     body = (body.replace("<h1>", '<h1 style="font-size:22px;margin:0 0 8px">')
                 .replace("<h2>", '<h2 style="font-size:18px;margin:28px 0 8px;color:#cf4310">')
                 .replace("<h3>", '<h3 style="font-size:15px;margin:20px 0 6px">')
+                .replace("<h4>", '<h4 style="font-size:15px;font-weight:500;color:#555;margin:0 0 12px">')
                 .replace("<a ", '<a style="color:#cf4310" '))
     web = f'<p style="font-size:12px;color:#666"><a href="{issue_url}">Read on the web</a></p>' if issue_url else ""
     return f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title></head>
