@@ -50,7 +50,10 @@ service. The Sheet exports as CSV.
 ## Setup
 
 ### 1. This repo
-1. **Settings → Secrets → Actions**: add `ANTHROPIC_API_KEY` (and optionally `NCBI_API_KEY`, `NCBI_EMAIL`).
+1. **Settings → Secrets → Actions**: add one way to reach Claude, and optionally `NCBI_API_KEY`, `NCBI_EMAIL`.
+   - `CLAUDE_CODE_OAUTH_TOKEN`: runs on your Claude subscription through Claude Code. Create it on your
+     machine with `claude setup-token`. It counts against the subscription's usage limits.
+   - or `ANTHROPIC_API_KEY`: billed per use on the Claude API. Used first when both are set.
 2. Let the Action push to the website: create a key pair with `ssh-keygen -t ed25519 -f site_key -N ""`.
    Add `site_key.pub` as a **deploy key with write access** on `DKundnani/dkundnani.github.io`, and
    `site_key` as the secret `SITE_DEPLOY_KEY` here. Then delete both files.
@@ -60,7 +63,7 @@ Local run (writes into `../dkundnani.github.io`, which you then review and push)
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e '.[dev]'
-export ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=...                     # or leave unset to use your Claude Code login
 biomed-ai-watch collect                          # fetch only, no Claude calls
 biomed-ai-watch run --topic "Electronic health records"
 pytest

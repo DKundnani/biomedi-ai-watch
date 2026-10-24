@@ -9,8 +9,7 @@ import time
 from datetime import date
 from pathlib import Path
 
-import anthropic
-
+from . import llm
 from .sources.papers import EUTILS, _ncbi_params
 from .http import session
 
@@ -25,17 +24,6 @@ def pick_topic(cfg: dict, end: date, override: str | None = None) -> str:
         return override
     topics = cfg["spotlight"]["topics"]
     return topics[end.isocalendar()[1] % len(topics)]
-
-
-def _stream(client: anthropic.Anthropic, llm_cfg: dict, messages: list, **kw):
-    with client.beta.messages.stream(
-        model=llm_cfg["model"], max_tokens=llm_cfg["max_tokens"], messages=messages,
-        betas=["server-side-fallback-2026-07-01"], fallbacks="default", **kw,
-    ) as s:
-        msg = s.get_final_message()
-    if msg.stop_reason == "refusal":
-        raise RuntimeError(f"Model declined the request: {msg.stop_details}")
-    return msg
 
 
 # ---------- 1. synonyms and search terms ----------
@@ -67,8 +55,8 @@ TERMS_SCHEMA = {
 }
 
 
-def expand_terms(client: anthropic.Anthropic, topic: str, llm_cfg: dict) -> dict:
-    msg = _stream(client, {**llm_cfg, "max_tokens": 8000}, [{"role": "user", "content": (
+def expand_terms(topic: str, llm_cfg: dict) -> dict:
+    return llm.structured((
         f"Topic for this week's AI-in-medicine spotlight: {topic}\n\n"
         "List the synonyms, abbreviations and closely related terms researchers and industry use for this "
         "topic (e.g. for Electronic Health Records: EHR, EMR, electronic medical records, clinical notes, "
@@ -76,9 +64,7 @@ def expand_terms(client: anthropic.Anthropic, topic: str, llm_cfg: dict) -> dict
         "topic, web search queries that would surface the latest AI developments in it, and 6-8 subareas "
         "of the topic (e.g. for EHR: clinical notes NLP, risk prediction, phenotyping, coding and billing, "
         "interoperability, patient portals) that will be cross-tabulated against evidence quality and "
-        "populations to find research gaps.")}],
-        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": TERMS_SCHEMA}})
-    return json.loads(next(b.text for b in msg.content if b.type == "text"))
+        "populations to find research gaps."), TERMS_SCHEMA, llm_cfg, effort="medium", max_tokens=8000)
 
 
 # ---------- 2. publication trend (real counts from PubMed) ----------
@@ -265,7 +251,7 @@ datasets), end with ONE fenced block tagged `chart` holding JSON:
 Use only numbers taken from a source you read. Omit the block if there's nothing solid to chart."""
 
 
-def research(client: anthropic.Anthropic, topic: str, terms: dict, trend: dict, gm: dict, today: date,
+def research(topic: str, terms: dict, trend: dict, gm: dict, today: date,
              llm_cfg: dict) -> tuple[str, dict | None]:
     trend_txt = "\n".join(f"{r['year']}: {r['topic_ai']} AI papers ({r['ai_share_pct']}% of {r['topic']})"
                           for r in trend["rows"])
@@ -273,20 +259,7 @@ def research(client: anthropic.Anthropic, topic: str, terms: dict, trend: dict, 
         today=today.isoformat(), topic=topic, synonyms=", ".join(terms["synonyms"]),
         mesh=", ".join(terms["mesh_terms"]), queries="; ".join(terms["web_queries"]), trend=trend_txt,
         gap_map=gap_map_text(gm))
-    tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 15},
-             {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 10}]
-    messages = [{"role": "user", "content": prompt}]
-
-    for _ in range(6):  # server tools may pause a long turn; re-send to let it continue
-        msg = _stream(client, llm_cfg, messages, tools=tools,
-                      output_config={"effort": llm_cfg["effort"]})
-        if msg.stop_reason != "pause_turn":
-            break
-        messages = [messages[0], {"role": "assistant", "content": msg.content}]
-    log.info("spotlight research: stop=%s in=%s out=%s request=%s", msg.stop_reason,
-             msg.usage.input_tokens, msg.usage.output_tokens, msg._request_id)
-
-    text = "".join(b.text for b in msg.content if b.type == "text").strip()
+    text = llm.web_research(prompt, llm_cfg).strip()
     spec = None
     m = re.search(r"```chart\s*(\{.*?\})\s*```", text, re.S)
     if m:
@@ -304,11 +277,10 @@ def research(client: anthropic.Anthropic, topic: str, terms: dict, trend: dict, 
 
 def build(cfg: dict, end: date, assets_dir: Path, override: str | None = None) -> dict:
     """Returns {"topic", "terms", "trend", "markdown", "charts": [relative paths]}."""
-    client = anthropic.Anthropic()
     topic = pick_topic(cfg, end, override)
     log.info("spotlight topic: %s", topic)
 
-    terms = expand_terms(client, topic, cfg["llm"])
+    terms = expand_terms(topic, cfg["llm"])
     query = terms["pubmed_query"]
     try:
         if _count(query) == 0:
@@ -329,7 +301,7 @@ def build(cfg: dict, end: date, assets_dir: Path, override: str | None = None) -
         plot_gap_map(topic, gm, gap_png)
         charts.append(gap_png.name)
 
-    markdown, spec = research(client, topic, terms, trend, gm, end, cfg["llm"])
+    markdown, spec = research(topic, terms, trend, gm, end, cfg["llm"])
     if spec:
         try:
             extra_png = assets_dir / f"{end}-spotlight-chart.png"

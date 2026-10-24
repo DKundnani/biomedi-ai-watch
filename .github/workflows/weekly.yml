@@ -40,9 +40,13 @@ jobs:
           cache: pip
       - run: pip install -e .
 
+      # Used when CLAUDE_CODE_OAUTH_TOKEN is set instead of ANTHROPIC_API_KEY.
+      - run: npm install -g @anthropic-ai/claude-code
+
       - name: Generate issue
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           NCBI_EMAIL: ${{ secrets.NCBI_EMAIL }}
           END: ${{ inputs.end }}

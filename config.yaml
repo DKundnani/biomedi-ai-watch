@@ -52,6 +52,9 @@ spotlight:
     - Ophthalmology
 
 llm:
+  # auto: the Claude API when ANTHROPIC_API_KEY is set, otherwise Claude Code on your Claude
+  # subscription (CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`). Or set api / claude_code.
+  backend: auto
   model: claude-opus-5-5
   effort: high
   max_tokens: 64000

@@ -4,8 +4,7 @@ from __future__ import annotations
 import json
 import logging
 
-import anthropic
-
+from . import llm
 from .models import Item
 
 log = logging.getLogger(__name__)
@@ -108,26 +107,7 @@ def analyze(items: list[Item], past_gaps: list[str], week_label: str, llm_cfg: d
         "connect them; otherwise find different gaps rather than repeating the spotlight's.",
     ])
 
-    client = anthropic.Anthropic()
-    with client.beta.messages.stream(
-        model=llm_cfg["model"],
-        max_tokens=llm_cfg["max_tokens"],
-        system=SYSTEM,
-        messages=[{"role": "user", "content": prompt}],
-        output_config={"effort": llm_cfg["effort"], "format": {"type": "json_schema", "schema": SCHEMA}},
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",
-    ) as stream:
-        msg = stream.get_final_message()
-
-    log.info("claude: model=%s stop=%s in=%s out=%s request=%s", msg.model, msg.stop_reason,
-             msg.usage.input_tokens, msg.usage.output_tokens, msg._request_id)
-    if msg.stop_reason == "refusal":
-        raise RuntimeError(f"Model declined the request: {msg.stop_details}")
-    if msg.stop_reason == "max_tokens":
-        raise RuntimeError("Output hit max_tokens; raise llm.max_tokens in config.yaml")
-
-    data = json.loads(next(b.text for b in msg.content if b.type == "text"))
+    data = llm.structured(prompt, SCHEMA, llm_cfg, system=SYSTEM)
     return _drop_unknown_ids(data, {i.id for i in items})
 
 
