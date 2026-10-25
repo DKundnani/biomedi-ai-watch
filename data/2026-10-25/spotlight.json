@@ -1,0 +1,419 @@
+{
+ "topic": "Cardiology",
+ "terms": {
+  "synonyms": [
+   "cardiology",
+   "cardiovascular medicine",
+   "cardiovascular disease",
+   "CVD",
+   "heart disease",
+   "cardiac disease",
+   "coronary artery disease",
+   "CAD",
+   "ischemic heart disease",
+   "acute coronary syndrome",
+   "ACS",
+   "myocardial infarction",
+   "MI",
+   "heart failure",
+   "HF",
+   "HFrEF",
+   "HFpEF",
+   "atrial fibrillation",
+   "AF",
+   "AFib",
+   "arrhythmia",
+   "cardiomyopathy",
+   "valvular heart disease",
+   "aortic stenosis",
+   "electrocardiogram",
+   "ECG",
+   "EKG",
+   "echocardiography",
+   "echo",
+   "cardiac MRI",
+   "CMR",
+   "coronary CT angiography",
+   "CCTA",
+   "coronary artery calcium",
+   "CAC",
+   "interventional cardiology",
+   "PCI",
+   "TAVR",
+   "electrophysiology",
+   "wearable ECG",
+   "photoplethysmography",
+   "PPG",
+   "cardiac imaging",
+   "cardiovascular risk prediction",
+   "MACE"
+  ],
+  "mesh_terms": [
+   "Cardiology",
+   "Cardiovascular Diseases",
+   "Heart Diseases",
+   "Coronary Artery Disease",
+   "Myocardial Ischemia",
+   "Myocardial Infarction",
+   "Acute Coronary Syndrome",
+   "Heart Failure",
+   "Atrial Fibrillation",
+   "Arrhythmias, Cardiac",
+   "Cardiomyopathies",
+   "Heart Valve Diseases",
+   "Aortic Valve Stenosis",
+   "Electrocardiography",
+   "Echocardiography",
+   "Magnetic Resonance Imaging, Cine",
+   "Computed Tomography Angiography",
+   "Coronary Angiography",
+   "Percutaneous Coronary Intervention",
+   "Transcatheter Aortic Valve Replacement",
+   "Heart Disease Risk Factors",
+   "Wearable Electronic Devices",
+   "Photoplethysmography"
+  ],
+  "pubmed_query": "(\"Cardiology\"[mh] OR \"Cardiovascular Diseases\"[mh] OR \"Heart Diseases\"[mh] OR \"Electrocardiography\"[mh] OR \"Echocardiography\"[mh] OR cardiology[tiab] OR cardiovascular[tiab] OR cardiac[tiab] OR \"heart disease\"[tiab] OR \"heart failure\"[tiab] OR \"coronary artery disease\"[tiab] OR \"myocardial infarction\"[tiab] OR \"atrial fibrillation\"[tiab] OR arrhythmia*[tiab] OR cardiomyopath*[tiab] OR electrocardiogra*[tiab] OR ECG[tiab] OR EKG[tiab] OR echocardiogra*[tiab])",
+  "web_queries": [
+   "AI ECG deep learning FDA clearance 2026",
+   "artificial intelligence echocardiography automated interpretation latest study 2026",
+   "AI cardiology randomized controlled trial results 2026",
+   "foundation model electrocardiogram cardiac imaging 2026",
+   "AI coronary CT angiography plaque analysis FFR-CT 2026",
+   "smartwatch wearable atrial fibrillation detection AI 2026",
+   "machine learning heart failure prediction deployment hospital 2026",
+   "large language model cardiology clinical decision support 2026"
+  ],
+  "subtopics": [
+   {
+    "name": "ECG interpretation",
+    "pubmed_clause": "(\"Electrocardiography\"[mh] OR electrocardiogra*[tiab] OR ECG[tiab] OR EKG[tiab])"
+   },
+   {
+    "name": "Echocardiography",
+    "pubmed_clause": "(\"Echocardiography\"[mh] OR echocardiogra*[tiab] OR \"cardiac ultrasound\"[tiab] OR \"point-of-care ultrasound\"[tiab])"
+   },
+   {
+    "name": "Cardiac CT/MRI imaging",
+    "pubmed_clause": "(\"Computed Tomography Angiography\"[mh] OR \"Coronary Angiography\"[mh] OR \"coronary CT angiography\"[tiab] OR CCTA[tiab] OR \"coronary artery calcium\"[tiab] OR \"cardiac magnetic resonance\"[tiab] OR \"cardiac MRI\"[tiab] OR CMR[tiab])"
+   },
+   {
+    "name": "Arrhythmia & AF detection",
+    "pubmed_clause": "(\"Atrial Fibrillation\"[mh] OR \"Arrhythmias, Cardiac\"[mh] OR \"atrial fibrillation\"[tiab] OR arrhythmia*[tiab] OR \"sudden cardiac death\"[tiab])"
+   },
+   {
+    "name": "Heart failure management",
+    "pubmed_clause": "(\"Heart Failure\"[mh] OR \"heart failure\"[tiab] OR HFrEF[tiab] OR HFpEF[tiab] OR \"left ventricular dysfunction\"[tiab] OR \"ejection fraction\"[tiab])"
+   },
+   {
+    "name": "CAD & ACS risk/diagnosis",
+    "pubmed_clause": "(\"Coronary Artery Disease\"[mh] OR \"Acute Coronary Syndrome\"[mh] OR \"Myocardial Infarction\"[mh] OR \"coronary artery disease\"[tiab] OR \"acute coronary syndrome\"[tiab] OR \"myocardial infarction\"[tiab] OR \"chest pain\"[tiab])"
+   },
+   {
+    "name": "CV risk prediction",
+    "pubmed_clause": "(\"Heart Disease Risk Factors\"[mh] OR \"cardiovascular risk\"[tiab] OR \"risk prediction\"[tiab] OR \"risk score\"[tiab] OR MACE[tiab] OR \"major adverse cardiovascular events\"[tiab])"
+   },
+   {
+    "name": "Wearables & remote monitoring",
+    "pubmed_clause": "(\"Wearable Electronic Devices\"[mh] OR \"Photoplethysmography\"[mh] OR wearable*[tiab] OR smartwatch*[tiab] OR photoplethysmogra*[tiab] OR \"remote monitoring\"[tiab] OR \"implantable cardiac monitor\"[tiab])"
+   }
+  ]
+ },
+ "trend": {
+  "query": "(\"Cardiology\"[mh] OR \"Cardiovascular Diseases\"[mh] OR \"Heart Diseases\"[mh] OR \"Electrocardiography\"[mh] OR \"Echocardiography\"[mh] OR cardiology[tiab] OR cardiovascular[tiab] OR cardiac[tiab] OR \"heart disease\"[tiab] OR \"heart failure\"[tiab] OR \"coronary artery disease\"[tiab] OR \"myocardial infarction\"[tiab] OR \"atrial fibrillation\"[tiab] OR arrhythmia*[tiab] OR cardiomyopath*[tiab] OR electrocardiogra*[tiab] OR ECG[tiab] OR EKG[tiab] OR echocardiogra*[tiab])",
+  "ai_clause": "(\"artificial intelligence\"[tiab] OR \"machine learning\"[tiab] OR \"deep learning\"[tiab] OR \"large language model*\"[tiab] OR \"natural language processing\"[tiab] OR \"Artificial Intelligence\"[mh])",
+  "rows": [
+   {
+    "year": 2017,
+    "topic": 128693,
+    "topic_ai": 698,
+    "ai_share_pct": 0.5
+   },
+   {
+    "year": 2018,
+    "topic": 132147,
+    "topic_ai": 1014,
+    "ai_share_pct": 0.8
+   },
+   {
+    "year": 2019,
+    "topic": 137010,
+    "topic_ai": 1612,
+    "ai_share_pct": 1.2
+   },
+   {
+    "year": 2020,
+    "topic": 156692,
+    "topic_ai": 2496,
+    "ai_share_pct": 1.6
+   },
+   {
+    "year": 2021,
+    "topic": 165570,
+    "topic_ai": 3465,
+    "ai_share_pct": 2.1
+   },
+   {
+    "year": 2022,
+    "topic": 160744,
+    "topic_ai": 4265,
+    "ai_share_pct": 2.7
+   },
+   {
+    "year": 2023,
+    "topic": 151871,
+    "topic_ai": 4562,
+    "ai_share_pct": 3.0
+   },
+   {
+    "year": 2024,
+    "topic": 153213,
+    "topic_ai": 6068,
+    "ai_share_pct": 4.0
+   },
+   {
+    "year": 2025,
+    "topic": 161775,
+    "topic_ai": 8644,
+    "ai_share_pct": 5.3
+   },
+   {
+    "year": 2026,
+    "topic": 136488,
+    "topic_ai": 8232,
+    "ai_share_pct": 6.0
+   }
+  ],
+  "partial_year": 2026
+ },
+ "gap_map": {
+  "years": "2022-2026",
+  "facets": [
+   "External validation",
+   "Prospective",
+   "RCT",
+   "Deployment / implementation",
+   "Pediatric",
+   "Low-resource / LMIC",
+   "Fairness / bias"
+  ],
+  "rows": [
+   {
+    "subtopic": "ECG interpretation",
+    "ai_papers": 4795,
+    "counts": {
+     "External validation": 470,
+     "Prospective": 385,
+     "RCT": 36,
+     "Deployment / implementation": 748,
+     "Pediatric": 149,
+     "Low-resource / LMIC": 101,
+     "Fairness / bias": 280
+    },
+    "pct": {
+     "External validation": 9.8,
+     "Prospective": 8.0,
+     "RCT": 0.8,
+     "Deployment / implementation": 15.6,
+     "Pediatric": 3.1,
+     "Low-resource / LMIC": 2.1,
+     "Fairness / bias": 5.8
+    }
+   },
+   {
+    "subtopic": "Echocardiography",
+    "ai_papers": 2352,
+    "counts": {
+     "External validation": 393,
+     "Prospective": 312,
+     "RCT": 30,
+     "Deployment / implementation": 316,
+     "Pediatric": 152,
+     "Low-resource / LMIC": 84,
+     "Fairness / bias": 191
+    },
+    "pct": {
+     "External validation": 16.7,
+     "Prospective": 13.3,
+     "RCT": 1.3,
+     "Deployment / implementation": 13.4,
+     "Pediatric": 6.5,
+     "Low-resource / LMIC": 3.6,
+     "Fairness / bias": 8.1
+    }
+   },
+   {
+    "subtopic": "Cardiac CT/MRI imaging",
+    "ai_papers": 2788,
+    "counts": {
+     "External validation": 327,
+     "Prospective": 306,
+     "RCT": 44,
+     "Deployment / implementation": 267,
+     "Pediatric": 67,
+     "Low-resource / LMIC": 22,
+     "Fairness / bias": 177
+    },
+    "pct": {
+     "External validation": 11.7,
+     "Prospective": 11.0,
+     "RCT": 1.6,
+     "Deployment / implementation": 9.6,
+     "Pediatric": 2.4,
+     "Low-resource / LMIC": 0.8,
+     "Fairness / bias": 6.3
+    }
+   },
+   {
+    "subtopic": "Arrhythmia & AF detection",
+    "ai_papers": 3332,
+    "counts": {
+     "External validation": 386,
+     "Prospective": 319,
+     "RCT": 47,
+     "Deployment / implementation": 460,
+     "Pediatric": 52,
+     "Low-resource / LMIC": 32,
+     "Fairness / bias": 146
+    },
+    "pct": {
+     "External validation": 11.6,
+     "Prospective": 9.6,
+     "RCT": 1.4,
+     "Deployment / implementation": 13.8,
+     "Pediatric": 1.6,
+     "Low-resource / LMIC": 1.0,
+     "Fairness / bias": 4.4
+    }
+   },
+   {
+    "subtopic": "Heart failure management",
+    "ai_papers": 3789,
+    "counts": {
+     "External validation": 560,
+     "Prospective": 411,
+     "RCT": 49,
+     "Deployment / implementation": 528,
+     "Pediatric": 84,
+     "Low-resource / LMIC": 56,
+     "Fairness / bias": 268
+    },
+    "pct": {
+     "External validation": 14.8,
+     "Prospective": 10.8,
+     "RCT": 1.3,
+     "Deployment / implementation": 13.9,
+     "Pediatric": 2.2,
+     "Low-resource / LMIC": 1.5,
+     "Fairness / bias": 7.1
+    }
+   },
+   {
+    "subtopic": "CAD & ACS risk/diagnosis",
+    "ai_papers": 3916,
+    "counts": {
+     "External validation": 547,
+     "Prospective": 412,
+     "RCT": 59,
+     "Deployment / implementation": 437,
+     "Pediatric": 31,
+     "Low-resource / LMIC": 37,
+     "Fairness / bias": 199
+    },
+    "pct": {
+     "External validation": 14.0,
+     "Prospective": 10.5,
+     "RCT": 1.5,
+     "Deployment / implementation": 11.2,
+     "Pediatric": 0.8,
+     "Low-resource / LMIC": 0.9,
+     "Fairness / bias": 5.1
+    }
+   },
+   {
+    "subtopic": "CV risk prediction",
+    "ai_papers": 3571,
+    "counts": {
+     "External validation": 706,
+     "Prospective": 450,
+     "RCT": 62,
+     "Deployment / implementation": 573,
+     "Pediatric": 79,
+     "Low-resource / LMIC": 53,
+     "Fairness / bias": 295
+    },
+    "pct": {
+     "External validation": 19.8,
+     "Prospective": 12.6,
+     "RCT": 1.7,
+     "Deployment / implementation": 16.0,
+     "Pediatric": 2.2,
+     "Low-resource / LMIC": 1.5,
+     "Fairness / bias": 8.3
+    }
+   },
+   {
+    "subtopic": "Wearables & remote monitoring",
+    "ai_papers": 1966,
+    "counts": {
+     "External validation": 138,
+     "Prospective": 147,
+     "RCT": 20,
+     "Deployment / implementation": 485,
+     "Pediatric": 42,
+     "Low-resource / LMIC": 58,
+     "Fairness / bias": 187
+    },
+    "pct": {
+     "External validation": 7.0,
+     "Prospective": 7.5,
+     "RCT": 1.0,
+     "Deployment / implementation": 24.7,
+     "Pediatric": 2.1,
+     "Low-resource / LMIC": 3.0,
+     "Fairness / bias": 9.5
+    }
+   }
+  ],
+  "overall": {
+   "years": "2022-2026",
+   "total": 29071,
+   "counts": {
+    "External validation": 3112,
+    "Prospective": 2346,
+    "RCT": 496,
+    "Deployment / implementation": 3724,
+    "Pediatric": 1027,
+    "Low-resource / LMIC": 511,
+    "Fairness / bias": 1724
+   }
+  }
+ },
+ "markdown": "### Key takeaways\n- Regulators are clearing cardiac AI faster than trials can test it: only 0.8% of ECG-AI papers are RCTs, and just [3 of 1,357](https://journals.plos.org/digitalhealth/article?id=10.1371%2Fjournal.pdig.0001597) FDA AI devices were tested on patient outcomes.\n- Since January 2026, AI coronary plaque analysis has a Category I CPT code (75577), paying over $1,000 in offices, [according to a vendor](https://www.caristo.com/medicare-finalizes-reimbursement-for-caristos-cari-plaque-across-hospital-and-office-settings/).\n- Funding is moving toward real-world rollout: the EU's \u20ac20M CHAIN network and ARPA-H's ADVOCATE program both pay for implementation rather than accuracy studies.\n\n### What's new\n- **Aug 19** \u2014 A census of 1,357 FDA AI devices found cardiovascular tools make up about 9%; only 34 devices had registered prospective trials [PLOS Digital Health](https://journals.plos.org/digitalhealth/article?id=10.1371%2Fjournal.pdig.0001597)\n- **Sep 9** \u2014 Queen of Hearts became the first AI-ECG model with FDA De Novo authorization for STEMI detection; its main evidence is a retrospective registry [TCTMD](https://www.tctmd.com/news/fda-clears-first-ai-ecg-model-acute-mi-detection)\n- **Sep 9** \u2014 ARPA-H awarded Tempus up to $9.5M for an autonomous heart-failure care agent and a planned multicenter prospective study [Business Wire](https://secure.businesswire.com/news/home/20260909819242/en/Tempus-Secures-Up-to-%249.5-Million-in-ARPA-H-ADVOCATE-Funding-to-Deploy-First-Autonomous-AI-in-Cardiology)\n- **Sep 28** \u2014 FDA cleared Tempus ECG-MR (510(k)), which flags undiagnosed moderate or severe mitral regurgitation in adults 65 and older; it is the company's fourth ECG-AI clearance [Business Wire](https://secure.businesswire.com/news/home/20260928106625/en/Tempus-Receives-FDA-Clearance-for-its-ECG-MR-AI-Product-Designed-to-Identify-Undiagnosed-Mitral-Regurgitation)\n- **Oct 7** \u2014 The ESC launched CHAIN (\u20ac20M from EU4Health), which will test six AI use cases in 13 countries and give tools \"AI passports\" [ESC](https://www.escardio.org/news/press/press-releases/from-promise-to-patient-impact-new-european-initiative-aims-to-accelerate-ai-in-cardiovascular-care/)\n\n### Novel gaps\n1. **Several AI-ECG alerts on one patient.** Evidence: RCTs are 0.8% of ECG-AI papers; one tool alone had [32% PPV](https://www.medrxiv.org/content/10.1101/2025.04.24.25326391). Study: stepped-wedge RCT running several cleared tools; endpoint: confirmed disease per echo ordered. Funder: PCORI.\n2. **Skin-tone accuracy of smartwatch (PPG) AF alerts.** Evidence: 4.4% fairness share, the map's lowest; melanin [absorbs green light](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12592569/). Study: prospective, measured skin tone, ECG-patch reference; endpoint: sensitivity by skin tone. Funder: NHLBI.\n3. **Children's arrhythmia AI, beyond LV dysfunction.** Evidence: 1.6% of AF-detection papers are pediatric; pediatric AI-ECG performance [varied by hospital](https://www.icthealth.org/news/ai-ecg-helps-target-mri-follow-up-in-repaired-tetralogy-of-fallot). Study: multicenter external validation for SVT and WPW; endpoint: sensitivity versus pediatric electrophysiologists. Funder: NICHD.\n\n*Dropped because already covered: AI-ECG for LV dysfunction in low-resource settings ([prospective Kenya study](https://www.utsouthwestern.edu/newsroom/articles/year-2026/may-ai-powered-electrocardiogram.html)) and autonomous heart-failure agents (ARPA-H-funded).*\n\n### Outlook\nWith reimbursement and EU and US funding now in place, the next proof cardiac AI needs is better patient outcomes, not higher accuracy scores.",
+ "chart_spec": {
+  "title": "FDA AI devices: evidence beyond clearance",
+  "type": "bar",
+  "x_label": "Evidence tier",
+  "y_label": "Number of devices",
+  "x": [
+   "Cleared",
+   "Registered prospective trial",
+   "Results posted",
+   "Peer-reviewed publication",
+   "Patient outcomes tested"
+  ],
+  "series": [
+   {
+    "name": "FDA AI/ML devices (to Dec 2025)",
+    "values": [
+     1357,
+     34,
+     12,
+     12,
+     3
+    ]
+   }
+  ],
+  "source": "PLOS Digital Health, https://journals.plos.org/digitalhealth/article?id=10.1371%2Fjournal.pdig.0001597"
+ }
+}

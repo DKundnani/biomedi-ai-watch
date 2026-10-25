@@ -1,0 +1,146 @@
+{
+ "headline": "Benchmarks Flatter Diagnostic AI; Real Clinical Inputs Tell a Harder Story",
+ "subtitle": "This week: LLM diagnosis on real inputs, measuring clinician oversight, and audits finding hidden failures",
+ "tldr": [
+  "A Science benchmark puts an AI physician panel at 83.2% on NEJM cases. A preprint finds multi-agent gains reverse on real emergency notes.",
+  "Oversight can be measured: in a randomized preprint, clinicians removed 18 of 22 unsupported LLM additions but only 6 of 22 wrong abbreviation expansions.",
+  "One ECG-AI 510(k) cleared this week. BMS led Pathos AI's $237M round. Grants went mostly to methods, not to trials of deployed tools."
+ ],
+ "paper_themes": [
+  {
+   "theme": "LLM diagnosis: benchmarks vs real inputs",
+   "summary": "Strong scores on curated cases sit beside preprints showing text overriding images, overconfidence, and multi-agent gains that reverse on real emergency notes.",
+   "ids": [
+    "pmid:42912144",
+    "doi:10.64898/2026.09.24.26363897",
+    "doi:10.64898/2026.10.17.26365809",
+    "doi:10.64898/2026.10.17.26365807",
+    "arxiv:2610.31586v1",
+    "pmid:42893001"
+   ]
+  },
+  {
+   "theme": "Measuring human-AI oversight",
+   "summary": "Studies move from accuracy to interaction: readers anchoring on AI, errors reviewers miss in AI drafts, directional disagreement metrics, and faster inbox handling.",
+   "ids": [
+    "doi:10.64898/2026.10.20.26365977",
+    "doi:10.64898/2026.10.16.26365578",
+    "doi:10.64898/2026.10.15.26365116",
+    "doi:10.64898/2026.10.19.26364791",
+    "doi:10.64898/2026.10.19.26365557",
+    "pmid:42925890"
+   ]
+  },
+  {
+   "theme": "Audits exposing hidden failures",
+   "summary": "Skin-tone-dependent labels, skull implants that cannot be implanted, weak OCT grounding, per-patient privacy risk, and digital twins whose accuracy does not track treatment ranking.",
+   "ids": [
+    "arxiv:2610.30901v1",
+    "arxiv:2610.30035v1",
+    "arxiv:2610.31205v1",
+    "arxiv:2610.30229v1",
+    "arxiv:2610.30577v1",
+    "arxiv:2610.29830v1"
+   ]
+  }
+ ],
+ "top_papers": [
+  {
+   "id": "pmid:42912144",
+   "note": "Peer-reviewed benchmark: 83.2% on NEJM cases vs 36.1% for generalist physicians, in a controlled setting only."
+  },
+  {
+   "id": "doi:10.64898/2026.09.24.26363897",
+   "note": "Preprint: multi-agent LLM teams improve recall on curated vignettes but reverse on 364 real emergency notes."
+  },
+  {
+   "id": "doi:10.64898/2026.10.17.26365809",
+   "note": "Preprint: referral wording swung four multimodal LLMs' glioma-vs-abscess calls far more than the MRI did."
+  },
+  {
+   "id": "doi:10.64898/2026.10.20.26365977",
+   "note": "Randomized preprint measures what clinicians catch in LLM discharge drafts; most wrong abbreviation expansions got through."
+  },
+  {
+   "id": "arxiv:2610.30901v1",
+   "note": "Erythema was labeled far less often on dark skin (OR 0.17); models trained on these labels repeat the bias."
+  }
+ ],
+ "grants_summary": "Mostly VA continuations plus NSF methods awards: PET harmonization, learning under temporal shift, and conformal uncertainty for language models. Few fund prospective evaluation of clinical AI already in use.",
+ "top_grants": [
+  {
+   "id": "nih:1R01AG097729-01A1",
+   "note": "$1.42M to harmonize amyloid and tau PET across sites and tracers, a data foundation for Alzheimer's AI."
+  },
+  {
+   "id": "nih:1IU1RD001795-01",
+   "note": "VA funds translation of real-time AI diagnosis of colorectal polyps; the VA performs about 300K colonoscopies yearly."
+  },
+  {
+   "id": "nsf:2646189",
+   "note": "CAREER award on temporal data shift, a main reason deployed health models lose accuracy over time."
+  }
+ ],
+ "products_summary": "One AI 510(k) cleared: ECG analysis software (AiTiALVSD). BMS led Pathos AI's $237M round alongside an Alzheimer's deal. FDA launched a neuroscience program. ESMO drug news dominated otherwise.",
+ "top_products": [
+  {
+   "id": "510k:K254302",
+   "note": "Another cardiovascular ECG-AI clearance, while evidence on patient outcomes for such tools stays scarce (see spotlight)."
+  },
+  {
+   "id": "rss:https://www.statnews.com/?p=1537794",
+   "note": "Pathos valued at $3B; deal combines a large Tempus dataset, Pathos AI and BMS drug development."
+  },
+  {
+   "id": "rss:http://www.fda.gov/news-events/press-announcements/fda-launches-new-program-advance-neuroscience-medical-product-development",
+   "note": "FDA's new NAIN neuroscience program; the announcement does not say what role AI will play."
+  }
+ ],
+ "research_gaps": [
+  {
+   "gap": "Diagnostic LLMs not tested on live, messy clinical inputs",
+   "evidence": "Benchmark used curated CPC and MIMIC cases. Preprints: multi-agent gains reversed on real ED notes, and referral text overrode MRI findings.",
+   "ids": [
+    "pmid:42912144",
+    "doi:10.64898/2026.09.24.26363897",
+    "doi:10.64898/2026.10.17.26365809"
+   ],
+   "suggested_study": "Prospective silent-mode study on live ED notes with adjudicated final diagnoses, including arms with misleading referral text.",
+   "recurring": false
+  },
+  {
+   "gap": "Unknown which AI error types clinician review actually catches",
+   "evidence": "Reviewers removed 18/22 unsupported additions but only 6/22 wrong abbreviations. Autoantibody readers' revised ratings almost all moved toward the model.",
+   "ids": [
+    "doi:10.64898/2026.10.20.26365977",
+    "doi:10.64898/2026.10.16.26365578",
+    "doi:10.64898/2026.10.15.26365116"
+   ],
+   "suggested_study": "Seeded-error audits of AI drafting and second-read tools in use, reporting catch rate and anchoring for each error type.",
+   "recurring": false
+  },
+  {
+   "gap": "Patient-facing health AI lacks real-user testing outside English",
+   "evidence": "SIM-UT tested chatbots in India, South Africa and Kenya with simulated users only. Drug-safety warnings weaker in Russian, Arabic and Hebrew Wikipedia.",
+   "ids": [
+    "arxiv:2610.30412v1",
+    "doi:10.64898/2026.10.20.26366071",
+    "doi:10.64898/2026.10.20.26365983",
+    "arxiv:2610.31256v1"
+   ],
+   "suggested_study": "Prospective multilingual audit of live triage-chatbot conversations, with clinician-rated safety errors by language and literacy.",
+   "recurring": false
+  }
+ ],
+ "social": {
+  "linkedin_post": "BioMed AI Watch, Oct 18\u201325: benchmarks vs real clinical inputs.\n\nIn Science, an AI system that simulates a panel of physicians reached 83.2% accuracy on NEJM clinicopathological cases, compared with 36.1% for generalist physicians. The authors stress this was a controlled benchmark.\n\nUnreviewed preprints this week show what changes outside that setting. Multi-agent LLM teams improved diagnostic recall on curated vignettes but reversed on 364 real emergency department notes. Four multimodal LLMs changed their glioma-vs-abscess calls based on how the referral was worded, far more than based on the MRI.\n\nOn oversight, a randomized paediatric discharge study (also a preprint) measured what clinicians caught in LLM drafts. They removed 18 of 22 unsupported additions but only 6 of 22 incorrect abbreviation expansions.\n\nThe gap: diagnostic AI needs prospective testing on live clinical inputs, and human review needs metrics broken down by error type.\n\n#ClinicalAI #DigitalHealth",
+  "x_thread": [
+   "BioMed AI Watch (Oct 18\u201325): diagnostic AI does well on curated cases. On real clinical inputs the picture is more mixed. \ud83e\uddf5",
+   "In Science, an AI system that simulates a panel of physicians reached 83.2% on NEJM CPC cases vs 36.1% for generalist physicians. The authors note this is a controlled benchmark setting.",
+   "Preprint (unreviewed): multi-agent LLM teams improved recall on curated vignettes, but the gain reversed on 364 real emergency department notes.",
+   "Preprint: how a referral was worded swung four multimodal LLMs' glioma-vs-abscess calls far more than the MRI image did.",
+   "Randomized preprint: clinicians reviewing LLM discharge drafts removed 18/22 unsupported additions, but only 6/22 wrong abbreviation expansions. Oversight should be measured by error type."
+  ],
+  "bluesky_post": "BioMed AI Watch: an AI physician panel scored 83.2% on NEJM cases in a Science benchmark. Preprints show the other side: multi-agent gains reverse on real ED notes, and referral wording outweighs the MRI. Next step: prospective tests on live clinical inputs."
+ }
+}
